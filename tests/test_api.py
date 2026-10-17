@@ -35,7 +35,7 @@ async def test_create_watch_and_rows(client, session_factory):
         "target_key": "lyd-guid", "name": "LOCK YOUR DOOR", "instance_name": "LOCKYOURDOOR01",
     })
     assert resp.status_code == 200
-    assert "LOCK YOUR DOOR" in resp.text
+    assert "refresh-watches" in resp.headers.get("HX-Trigger", "")
 
     # duplicate target_key is a no-op, not an error
     resp2 = await client.post("/api/watches", data={
@@ -153,6 +153,61 @@ async def test_create_and_test_channel(client, session_factory, monkeypatch):
         logs = list((await db.execute(select(NotificationLog))).scalars())
         assert len(logs) == 1
         assert logs[0].kind == "test"
+
+
+async def test_edit_channel_updates_config_and_test_message(client, session_factory):
+    async with session_factory() as db:
+        channel = Channel(name="orig", type="discord",
+                          config={"webhook_url": "https://discord.com/api/webhooks/1/old"})
+        db.add(channel)
+        await db.commit()
+        channel_id = channel.id
+
+    resp = await client.post(f"/api/channels/{channel_id}", data={
+        "name": "renamed",
+        "config_webhook_url": "https://discord.com/api/webhooks/2/new",
+        "test_message": "custom test ping",
+    })
+    assert resp.status_code == 200
+    async with session_factory() as db:
+        refreshed = await db.get(Channel, channel_id)
+        assert refreshed.name == "renamed"
+        assert refreshed.config["webhook_url"] == "https://discord.com/api/webhooks/2/new"
+        assert refreshed.test_message == "custom test ping"
+
+    # invalid webhook is rejected and nothing changes
+    resp2 = await client.post(f"/api/channels/{channel_id}", data={
+        "name": "renamed", "config_webhook_url": "http://evil.example", "test_message": "",
+    })
+    assert "Webhook URL" in resp2.text
+    async with session_factory() as db:
+        refreshed = await db.get(Channel, channel_id)
+        assert refreshed.config["webhook_url"] == "https://discord.com/api/webhooks/2/new"
+
+
+async def test_channel_test_uses_custom_message(client, session_factory, monkeypatch):
+    async with session_factory() as db:
+        channel = Channel(name="t", type="discord",
+                          config={"webhook_url": "https://discord.com/api/webhooks/1/t"},
+                          test_message="my custom test")
+        db.add(channel)
+        await db.commit()
+        channel_id = channel.id
+
+    sent = []
+
+    class FakeNotifier(NotifierPlugin):
+        type = "discord"
+        display_name = "Fake"
+
+        async def send(self, config, message):
+            sent.append(message)
+            return NotifyResult(success=True)
+
+    monkeypatch.setattr("app.routers.api.get_notifier", lambda t: FakeNotifier())
+    resp = await client.post(f"/api/channels/{channel_id}/test")
+    assert resp.status_code == 200
+    assert sent == ["my custom test"]
 
 
 async def test_delete_channel_scrubs_watch_refs(client, session_factory):

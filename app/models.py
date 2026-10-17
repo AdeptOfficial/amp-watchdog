@@ -75,6 +75,7 @@ class Channel(Base):
     type: Mapped[str] = mapped_column(String(20), default="discord")
     config: Mapped[dict] = mapped_column(JSON, default=dict)  # schema owned by the notifier plugin
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    test_message: Mapped[str | None] = mapped_column(Text, nullable=True)  # None = built-in preview
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     last_test_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     last_test_ok: Mapped[bool | None] = mapped_column(Boolean, nullable=True)

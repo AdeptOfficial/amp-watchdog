@@ -1,5 +1,30 @@
 # amp-watchdog Development Diary
 
+## 2026-10-17: UX audit round + channel editing (user feedback)
+
+- **Disabled-state audit** after the user caught greyed-out action buttons: rows now dim
+  content cells only — Enable/Resume/Edit/Delete stay fully clickable, with "disabled"/
+  "paused" badges. Dashboard: paused watches show a "paused" chip instead of a
+  Check-now button that the scheduler would silently ignore; Check-now gives "Queued ✓"
+  feedback. Send test on a disabled channel is greyed and unclickable (tooltip explains).
+  Lesson recorded: dim content, never controls; audit every disabled/paused/empty state.
+- **Channels are now editable**: per-row Edit form (name, plugin config fields, custom
+  test message). New nullable `channels.test_message` column — first live use of the
+  add-column migration dict, applied cleanly on deploy. "Send test" sends the custom
+  message, or a built-in preview showing all three alert shapes (offline/sleeping/online)
+  with a note that real alerts carry the live state.
+- Removed the user's real Discord ID from the mention-field placeholder (public repo).
+- 48 tests. Redeployed to LXC 212 several times through the round.
+
+## 2026-10-17: UI polish after first user feedback
+
+- Dashboard SSE indicator is now a pulsing green dot (amber when reconnecting) instead
+  of the "live" text label.
+- Watches page: the discover panel loads automatically on page open (big "Add watch"
+  button removed); clicking **Watch** flips the row to "watching ✓" instantly via
+  `HX-Trigger: refresh-watches, refresh-discover` response events, and deleting a watch
+  flips the discover row back the same way. 45 tests still green; redeployed to LXC 212.
+
 ## 2026-10-17: v0.1.0 — initial implementation
 
 - Full app built in one pass following the homeserver New App Template (status-tracker

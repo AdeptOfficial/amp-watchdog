@@ -100,6 +100,16 @@ def test_render_custom_template_with_unknown_placeholder():
     assert message == "LYD went offline at 12:00 {bogus}"
 
 
+async def test_send_test_defaults_and_custom_message():
+    fake = FakeNotifier()
+    await fake.send_test({})
+    assert "amp-watchdog" in fake.sent[0]  # built-in preview
+    await fake.send_test({}, "custom")
+    assert fake.sent[1] == "custom"
+    await fake.send_test({}, "   ")  # whitespace-only falls back to preview
+    assert "amp-watchdog" in fake.sent[2]
+
+
 def test_render_realert_prefix():
     watch = make_watch()
     message = render_message(watch, "realert", "offline", "offline", "UTC", NOW)

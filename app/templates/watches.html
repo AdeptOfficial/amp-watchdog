@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Watches · amp-watchdog{% endblock %}
 {% block content %}
-<div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-bold">Watches</h1>
-    <button hx-get="/api/amp/instances" hx-target="#discover-panel" hx-swap="innerHTML"
-            class="px-3 py-2 text-sm rounded bg-green-700 hover:bg-green-600 font-medium">
-        + Add watch (discover from AMP)
-    </button>
-</div>
+<h1 class="text-2xl font-bold mb-4">Watches</h1>
 
-<div id="discover-panel" class="mb-4"></div>
+<div id="discover-panel" class="mb-4"
+     hx-get="/api/amp/instances"
+     hx-trigger="load, refresh-discover from:body"
+     hx-swap="innerHTML">
+    <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-sm text-gray-500">
+        Discovering instances from AMP…
+    </div>
+</div>
 
 <div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
     <table class="w-full text-sm">
@@ -23,7 +24,10 @@
                 <th class="px-4 py-3"></th>
             </tr>
         </thead>
-        <tbody id="watch-rows" hx-swap="innerHTML">
+        <tbody id="watch-rows"
+               hx-get="/partials/watch-rows"
+               hx-trigger="refresh-watches from:body"
+               hx-swap="innerHTML">
             {% include "components/watch_rows.html" %}
         </tbody>
     </table>

@@ -3,7 +3,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 from sqlalchemy import delete as sa_delete
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -87,7 +87,7 @@ async def discover_instances(request: Request, db: AsyncSession = Depends(get_db
 
 # ---------- watches ----------
 
-@router.post("/watches", response_class=HTMLResponse)
+@router.post("/watches")
 async def create_watch(request: Request, db: AsyncSession = Depends(get_db)):
     form = await request.form()
     target_key = str(form.get("target_key", "")).strip()
@@ -110,7 +110,8 @@ async def create_watch(request: Request, db: AsyncSession = Depends(get_db)):
             ))
             await db.commit()
             request_immediate_sweep()
-    return await _watch_rows(request, db)
+    # The Watch button uses hx-swap="none"; these events refresh both panels
+    return Response(status_code=200, headers={"HX-Trigger": "refresh-watches, refresh-discover"})
 
 
 @router.get("/watches/{watch_id}/edit", response_class=HTMLResponse)
@@ -169,7 +170,9 @@ async def delete_watch(watch_id: int, request: Request, db: AsyncSession = Depen
         await db.execute(sa_delete(Transition).where(Transition.watch_id == watch_id))
         await db.delete(watch)
         await db.commit()
-    return await _watch_rows(request, db)
+    response = await _watch_rows(request, db)
+    response.headers["HX-Trigger"] = "refresh-discover"  # flips 'watching ✓' back to a Watch button
+    return response
 
 
 @router.post("/watches/{watch_id}/check-now")
@@ -227,6 +230,47 @@ async def create_channel(request: Request, db: AsyncSession = Depends(get_db)):
     return await _channel_rows(request, db)
 
 
+@router.get("/channels/{channel_id}/edit", response_class=HTMLResponse)
+async def edit_channel_form(channel_id: int, request: Request, db: AsyncSession = Depends(get_db)):
+    channel = await db.get(Channel, channel_id)
+    if channel is None:
+        return HTMLResponse("")
+    plugin = get_notifier(channel.type)
+    return templates.TemplateResponse(
+        request,
+        "components/channel_form.html",
+        {"channel": channel, "plugin": plugin},
+    )
+
+
+@router.post("/channels/{channel_id}", response_class=HTMLResponse)
+async def update_channel(channel_id: int, request: Request, db: AsyncSession = Depends(get_db)):
+    channel = await db.get(Channel, channel_id)
+    if channel is None:
+        return await _channel_rows(request, db)
+    plugin = get_notifier(channel.type)
+    form = await request.form()
+    name = str(form.get("name", "")).strip()
+    config = dict(channel.config or {})
+    if plugin is not None:
+        config = {f.name: str(form.get(f"config_{f.name}", "")).strip() for f in plugin.config_fields}
+        problems = plugin.validate_config(config)
+    else:
+        problems = []
+    if not name:
+        problems.insert(0, "Name is required")
+    existing = await db.execute(select(Channel).where(Channel.name == name, Channel.id != channel_id))
+    if name and existing.scalar_one_or_none() is not None:
+        problems.append(f"A channel named '{name}' already exists")
+    if problems:
+        return await _channel_rows(request, db, error="; ".join(problems))
+    channel.name = name
+    channel.config = config
+    channel.test_message = str(form.get("test_message", "")).strip() or None
+    await db.commit()
+    return await _channel_rows(request, db)
+
+
 @router.post("/channels/{channel_id}/test", response_class=HTMLResponse)
 async def test_channel(channel_id: int, request: Request, db: AsyncSession = Depends(get_db)):
     channel = await db.get(Channel, channel_id)
@@ -235,7 +279,7 @@ async def test_channel(channel_id: int, request: Request, db: AsyncSession = Dep
         if plugin is None:
             channel.last_test_ok = False
         else:
-            result = await plugin.send_test(channel.config or {})
+            result = await plugin.send_test(channel.config or {}, channel.test_message)
             channel.last_test_ok = result.success
             db.add(NotificationLog(
                 watch_id=None, channel_id=channel.id, kind="test",

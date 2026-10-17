@@ -63,7 +63,11 @@ async def run_migrations(conn):
     existing_schema = await conn.run_sync(get_existing_columns)
 
     # table -> column -> (type, default); add entries here when models grow columns
-    migrations: dict[str, dict[str, tuple[str, str]]] = {}
+    migrations: dict[str, dict[str, tuple[str, str]]] = {
+        "channels": {
+            "test_message": ("TEXT", "NULL"),
+        },
+    }
 
     for table_name, columns in migrations.items():
         if table_name not in existing_schema:

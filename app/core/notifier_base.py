@@ -41,5 +41,13 @@ class NotifierPlugin(ABC):
     async def send(self, config: dict, message: str) -> NotifyResult:
         ...
 
-    async def send_test(self, config: dict) -> NotifyResult:
-        return await self.send(config, "🔔 amp-watchdog test notification — channel works!")
+    DEFAULT_TEST_MESSAGE = (
+        "\U0001f9ea **amp-watchdog** test — this channel is wired up. "
+        "Example alerts (each uses the live state at the time):\n"
+        "\U0001f534 **Lock Your Door** is **offline** (Stopped)\n"
+        "\U0001f4a4 **Lock Your Door** is **sleeping** (Sleeping)\n"
+        "\U0001f7e2 **Lock Your Door** is **online** (Ready)"
+    )
+
+    async def send_test(self, config: dict, message: str | None = None) -> NotifyResult:
+        return await self.send(config, (message or "").strip() or self.DEFAULT_TEST_MESSAGE)

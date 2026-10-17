@@ -9,7 +9,8 @@ AMP-managed game servers can't be monitored from the outside: AMP holds the game
 - **Watchlist UI** — discover instances live from AMP's API and pick which to watch
 - **Per-watch rules** — check interval, which state transitions alert (e.g. alert on offline, stay quiet about sleep cycles), re-alert while still down, quiet hours
 - **Custom messages** — per-watch template with placeholders (`{name}`, `{from_state}`, `{to_state}`, `{app_state}`, `{mention}`, `{time}`)
-- **Pluggable notifiers** — Discord webhook today; new channels (ntfy, email) drop in as single-file plugins that auto-generate their own config form
+- **Pluggable notifiers** — Discord webhook today; new channels (ntfy, email) drop in as single-file plugins that auto-generate their own config and edit forms
+- **Channel management** — add, edit, enable/disable, delete; per-channel custom test message with a send-test button that previews the real alert format
 - **Pluggable checkers** — AMP today; the watch schema is checker-agnostic (HTTP, A2S, … later)
 - **Live dashboard** — SSE-pushed status dots, transition history, Check Now button
 - **No flapping** — transitional states (Starting/Restarting/Stopping) never alert; only stable-state changes do

@@ -20,7 +20,7 @@
                 {% if t.target_key in watched_keys %}
                 <span class="text-xs text-green-500">watching ✓</span>
                 {% else %}
-                <form hx-post="/api/watches" hx-target="#watch-rows" hx-swap="innerHTML" class="inline">
+                <form hx-post="/api/watches" hx-swap="none" class="inline">
                     <input type="hidden" name="target_key" value="{{ t.target_key }}">
                     <input type="hidden" name="name" value="{{ t.name }}">
                     <input type="hidden" name="instance_name" value="{{ t.meta.get('instance_name') }}">

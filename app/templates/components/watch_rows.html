@@ -1,15 +1,18 @@
 {% for w in watches %}
-<tr class="border-b border-gray-700/50 {% if not w.enabled %}opacity-40{% endif %}">
-    <td class="px-4 py-3 font-medium">{{ w.display_name }}</td>
-    <td class="px-4 py-3 text-gray-400">{{ (w.config or {}).get('instance_name') or w.target_key }}</td>
-    <td class="px-4 py-3 text-gray-400">{{ w.check_interval_seconds }}s</td>
-    <td class="px-4 py-3 text-xs text-gray-400">
+<tr class="border-b border-gray-700/50">
+    <td class="px-4 py-3 font-medium {% if not w.enabled %}opacity-40{% endif %}">
+        {{ w.display_name }}
+        {% if not w.enabled %}<span class="ml-1 px-1.5 py-0.5 text-xs bg-gray-700 text-gray-400 rounded">paused</span>{% endif %}
+    </td>
+    <td class="px-4 py-3 text-gray-400 {% if not w.enabled %}opacity-40{% endif %}">{{ (w.config or {}).get('instance_name') or w.target_key }}</td>
+    <td class="px-4 py-3 text-gray-400 {% if not w.enabled %}opacity-40{% endif %}">{{ w.check_interval_seconds }}s</td>
+    <td class="px-4 py-3 text-xs text-gray-400 {% if not w.enabled %}opacity-40{% endif %}">
         {% set active_rules = (w.notify_rules or {}).items() | selectattr(1) | map(attribute=0) | list %}
         {{ active_rules | join(', ') if active_rules else 'nothing' }}
         {% if w.realert_minutes %}<span class="text-amber-400"> · re-alert {{ w.realert_minutes }}m</span>{% endif %}
         {% if w.quiet_start and w.quiet_end %}<span class="text-blue-400"> · quiet {{ w.quiet_start }}–{{ w.quiet_end }}</span>{% endif %}
     </td>
-    <td class="px-4 py-3 text-gray-400">{{ (w.channel_ids or []) | length }}</td>
+    <td class="px-4 py-3 text-gray-400 {% if not w.enabled %}opacity-40{% endif %}">{{ (w.channel_ids or []) | length }}</td>
     <td class="px-4 py-3 text-right whitespace-nowrap">
         <button hx-get="/api/watches/{{ w.id }}/edit" hx-target="#watch-edit-panel" hx-swap="innerHTML"
                 class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">Edit</button>

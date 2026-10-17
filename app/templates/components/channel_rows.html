@@ -2,10 +2,13 @@
 <tr><td colspan="4" class="px-4 py-2 text-red-400 text-sm bg-red-950/40">{{ error }}</td></tr>
 {% endif %}
 {% for c in channels %}
-<tr class="border-b border-gray-700/50 {% if not c.enabled %}opacity-40{% endif %}">
-    <td class="px-4 py-3 font-medium">{{ c.name }}</td>
-    <td class="px-4 py-3 text-gray-400">{{ c.type }}</td>
-    <td class="px-4 py-3 text-xs">
+<tr class="border-b border-gray-700/50">
+    <td class="px-4 py-3 font-medium {% if not c.enabled %}opacity-40{% endif %}">
+        {{ c.name }}
+        {% if not c.enabled %}<span class="ml-1 px-1.5 py-0.5 text-xs bg-gray-700 text-gray-400 rounded">disabled</span>{% endif %}
+    </td>
+    <td class="px-4 py-3 text-gray-400 {% if not c.enabled %}opacity-40{% endif %}">{{ c.type }}</td>
+    <td class="px-4 py-3 text-xs {% if not c.enabled %}opacity-40{% endif %}">
         {% if c.last_test_at %}
         <span class="{{ 'text-green-400' if c.last_test_ok else 'text-red-400' }}">
             {{ '✓ ok' if c.last_test_ok else '✗ failed' }}
@@ -16,8 +19,15 @@
         {% endif %}
     </td>
     <td class="px-4 py-3 text-right whitespace-nowrap">
+        <button hx-get="/api/channels/{{ c.id }}/edit" hx-target="#channel-edit-panel" hx-swap="innerHTML"
+                class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">Edit</button>
+        {% if c.enabled %}
         <button hx-post="/api/channels/{{ c.id }}/test" hx-target="#channel-rows" hx-swap="innerHTML"
                 class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">Send test</button>
+        {% else %}
+        <button disabled title="Enable the channel to test it"
+                class="px-2 py-1 text-xs rounded bg-gray-700 opacity-40 cursor-not-allowed">Send test</button>
+        {% endif %}
         <button hx-post="/api/channels/{{ c.id }}/toggle" hx-target="#channel-rows" hx-swap="innerHTML"
                 class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">
             {{ 'Disable' if c.enabled else 'Enable' }}
