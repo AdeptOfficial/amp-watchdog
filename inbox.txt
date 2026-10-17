@@ -1,0 +1,9 @@
+Quick capture file for issues/features when no assistant is available.
+Add notes under "Issues:" or "Features:" — the assistant processes and clears them on startup.
+
+----------------------------------------
+issues:
+
+-----------------------------------------
+features:
+

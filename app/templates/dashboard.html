@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · amp-watchdog{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Dashboard</h1>
+    <span id="sse-status" class="text-xs text-gray-500">connecting…</span>
+</div>
+
+<div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-750 text-gray-400 text-left">
+            <tr class="border-b border-gray-700">
+                <th class="px-4 py-3">Status</th>
+                <th class="px-4 py-3">Name</th>
+                <th class="px-4 py-3">AMP state</th>
+                <th class="px-4 py-3">Last check</th>
+                <th class="px-4 py-3">Last change</th>
+                <th class="px-4 py-3"></th>
+            </tr>
+        </thead>
+        <tbody id="watch-tbody"
+               hx-get="/partials/dashboard-rows"
+               hx-trigger="every 30s"
+               hx-swap="innerHTML">
+            {% include "components/dashboard_rows.html" %}
+        </tbody>
+    </table>
+    {% if not watches %}
+    <p class="px-4 py-6 text-gray-500 text-sm">No watches yet — add some on the <a href="/watches" class="text-green-400 hover:underline">Watches</a> page.</p>
+    {% endif %}
+</div>
+
+<h2 class="text-lg font-semibold mt-8 mb-3">Recent transitions</h2>
+<div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+    <table class="w-full text-sm">
+        <thead class="text-gray-400 text-left">
+            <tr class="border-b border-gray-700">
+                <th class="px-4 py-2">When</th>
+                <th class="px-4 py-2">Watch</th>
+                <th class="px-4 py-2">Change</th>
+                <th class="px-4 py-2">Notified</th>
+            </tr>
+        </thead>
+        <tbody id="history-tbody"
+               hx-get="/api/history?limit=25"
+               hx-trigger="load, every 60s"
+               hx-swap="innerHTML">
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const es = new EventSource('/api/sse');
+    const sseStatus = document.getElementById('sse-status');
+    es.addEventListener('connected', () => { sseStatus.textContent = 'live'; sseStatus.classList.add('text-green-500'); });
+    es.onerror = () => { sseStatus.textContent = 'reconnecting…'; sseStatus.classList.remove('text-green-500'); };
+    es.addEventListener('watch_update', () => {
+        htmx.ajax('GET', '/partials/dashboard-rows', {target: '#watch-tbody', swap: 'innerHTML'});
+        htmx.ajax('GET', '/api/history?limit=25', {target: '#history-tbody', swap: 'innerHTML'});
+    });
+</script>
+{% endblock %}

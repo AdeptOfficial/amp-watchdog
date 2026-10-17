@@ -1,0 +1,87 @@
+<div class="bg-gray-800 rounded-lg border border-green-800 p-4">
+    <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold">Edit: {{ watch.display_name }}</h2>
+        <button onclick="document.getElementById('watch-edit-panel').innerHTML=''"
+                class="text-gray-500 hover:text-gray-300 text-sm">✕ close</button>
+    </div>
+    <form hx-post="/api/watches/{{ watch.id }}" hx-target="#watch-rows" hx-swap="innerHTML"
+          hx-on::after-request="if(event.detail.successful) document.getElementById('watch-edit-panel').innerHTML=''"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+        <label class="block">
+            <span class="text-gray-400">Display name</span>
+            <input name="display_name" value="{{ watch.display_name }}"
+                   class="mt-1 w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5">
+        </label>
+
+        <label class="block">
+            <span class="text-gray-400">Check interval (seconds, min 10)</span>
+            <input name="check_interval_seconds" type="number" min="10" value="{{ watch.check_interval_seconds }}"
+                   class="mt-1 w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5">
+        </label>
+
+        <div class="block">
+            <span class="text-gray-400">Alert on these changes</span>
+            <div class="mt-1 grid grid-cols-2 gap-1">
+                {% for key in rule_keys %}
+                <label class="flex items-center gap-2 text-gray-300">
+                    <input type="checkbox" name="rule__{{ key }}" class="accent-green-600"
+                           {% if (watch.notify_rules or {}).get(key) %}checked{% endif %}>
+                    <span class="text-xs">{{ key.replace('->', ' → ') }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="block">
+            <span class="text-gray-400">Notification channels</span>
+            <div class="mt-1 space-y-1">
+                {% for c in channels %}
+                <label class="flex items-center gap-2 text-gray-300">
+                    <input type="checkbox" name="channels" value="{{ c.id }}" class="accent-green-600"
+                           {% if c.id in (watch.channel_ids or []) %}checked{% endif %}>
+                    <span class="text-xs">{{ c.name }} ({{ c.type }}){% if not c.enabled %} — disabled{% endif %}</span>
+                </label>
+                {% else %}
+                <p class="text-xs text-gray-500">No channels yet — add one on the <a href="/channels" class="text-green-400">Channels</a> page.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <label class="block">
+            <span class="text-gray-400">Re-alert while offline (minutes, 0 = off)</span>
+            <input name="realert_minutes" type="number" min="0" value="{{ watch.realert_minutes }}"
+                   class="mt-1 w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5">
+        </label>
+
+        <div class="grid grid-cols-2 gap-2">
+            <label class="block">
+                <span class="text-gray-400">Quiet from</span>
+                <input name="quiet_start" type="time" value="{{ watch.quiet_start or '' }}"
+                       class="mt-1 w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5">
+            </label>
+            <label class="block">
+                <span class="text-gray-400">Quiet until</span>
+                <input name="quiet_end" type="time" value="{{ watch.quiet_end or '' }}"
+                       class="mt-1 w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5">
+            </label>
+        </div>
+
+        <label class="block">
+            <span class="text-gray-400">Discord mention ID (optional)</span>
+            <input name="mention_id" value="{{ watch.mention_id or '' }}" placeholder="e.g. 351434936655282188"
+                   class="mt-1 w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5">
+        </label>
+
+        <label class="block md:col-span-2">
+            <span class="text-gray-400">Message template (blank = default)</span>
+            <textarea name="message_template" rows="2" placeholder="{mention} {emoji} **{name}** is **{to_state}** ({app_state})"
+                      class="mt-1 w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 font-mono text-xs">{{ watch.message_template or '' }}</textarea>
+            <span class="text-xs text-gray-500">Placeholders: {name} {instance} {from_state} {to_state} {app_state} {time} {mention} {emoji}</span>
+        </label>
+
+        <div class="md:col-span-2">
+            <button type="submit" class="px-4 py-2 rounded bg-green-700 hover:bg-green-600 font-medium">Save</button>
+        </div>
+    </form>
+</div>

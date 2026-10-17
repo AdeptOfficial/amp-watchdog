@@ -1,0 +1,27 @@
+# amp-watchdog — AMP instance status monitor
+# Internal-only service: LAN/Tailscale access, no tunnel, no auth ("the network is the auth").
+services:
+  amp-watchdog:
+    container_name: amp-watchdog
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - TZ=${TZ:-America/Chicago}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - DATABASE_URL=sqlite:////config/watchdog.db
+      - AMP_BASE_URL=${AMP_BASE_URL:-http://10.0.1.52:8080}
+      - AMP_USERNAME=${AMP_USERNAME:-status-reader}
+      - AMP_PASSWORD=${AMP_PASSWORD}
+      - SCHEDULER_TICK=${SCHEDULER_TICK:-5}
+      - DEFAULT_CHECK_INTERVAL=${DEFAULT_CHECK_INTERVAL:-60}
+    volumes:
+      - /opt/appdata/amp-watchdog:/config
+    ports:
+      - 8200:8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped

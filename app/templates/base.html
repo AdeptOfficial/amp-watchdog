@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}amp-watchdog{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%2322c55e' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'/></svg>">
+
+    <!-- Tailwind + htmx via CDN (no build step) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-14">
+                <a href="/" class="flex items-center space-x-2">
+                    <svg class="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <span class="font-bold text-lg">amp-watchdog</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    {% for href, key, label in [('/', 'dashboard', 'Dashboard'), ('/watches', 'watches', 'Watches'), ('/channels', 'channels', 'Channels')] %}
+                    <a href="{{ href }}"
+                       class="px-3 py-2 rounded-md text-sm font-medium {% if active_page == key %}bg-gray-700 text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                        {{ label }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 border-t border-gray-700 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 py-3">
+            <p class="text-center text-gray-500 text-xs">amp-watchdog v0.1.0</p>
+        </div>
+    </footer>
+
+    <!-- Convert UTC timestamps (span.local-time[data-utc]) to local time -->
+    <script>
+        function convertTimestampsToLocal(root) {
+            (root || document).querySelectorAll('.local-time').forEach(el => {
+                const utc = el.dataset.utc;
+                if (!utc) { el.textContent = '—'; return; }
+                const d = new Date(utc);
+                el.textContent = d.toLocaleString([], {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => convertTimestampsToLocal());
+        document.body.addEventListener('htmx:afterSwap', (e) => convertTimestampsToLocal(e.target));
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

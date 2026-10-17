@@ -1,0 +1,32 @@
+{% if error %}
+<tr><td colspan="4" class="px-4 py-2 text-red-400 text-sm bg-red-950/40">{{ error }}</td></tr>
+{% endif %}
+{% for c in channels %}
+<tr class="border-b border-gray-700/50 {% if not c.enabled %}opacity-40{% endif %}">
+    <td class="px-4 py-3 font-medium">{{ c.name }}</td>
+    <td class="px-4 py-3 text-gray-400">{{ c.type }}</td>
+    <td class="px-4 py-3 text-xs">
+        {% if c.last_test_at %}
+        <span class="{{ 'text-green-400' if c.last_test_ok else 'text-red-400' }}">
+            {{ '✓ ok' if c.last_test_ok else '✗ failed' }}
+        </span>
+        <span class="text-gray-500 local-time" data-utc="{{ iso(c.last_test_at) }}"></span>
+        {% else %}
+        <span class="text-gray-500">never tested</span>
+        {% endif %}
+    </td>
+    <td class="px-4 py-3 text-right whitespace-nowrap">
+        <button hx-post="/api/channels/{{ c.id }}/test" hx-target="#channel-rows" hx-swap="innerHTML"
+                class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">Send test</button>
+        <button hx-post="/api/channels/{{ c.id }}/toggle" hx-target="#channel-rows" hx-swap="innerHTML"
+                class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">
+            {{ 'Disable' if c.enabled else 'Enable' }}
+        </button>
+        <button hx-delete="/api/channels/{{ c.id }}" hx-target="#channel-rows" hx-swap="innerHTML"
+                hx-confirm="Delete channel '{{ c.name }}'? Watches using it will simply stop sending here."
+                class="px-2 py-1 text-xs rounded bg-red-900 hover:bg-red-800">Delete</button>
+    </td>
+</tr>
+{% else %}
+<tr><td colspan="4" class="px-4 py-4 text-gray-500 text-sm">No channels yet — add one below.</td></tr>
+{% endfor %}
