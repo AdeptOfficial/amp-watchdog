@@ -94,6 +94,20 @@ def test_render_default_template():
     assert "Stopped" in message
 
 
+def test_mention_only_pings_on_offline():
+    watch = make_watch(mention_id="42")
+    # online -> sleeping: regular message, no ping
+    message = render_message(watch, "transition", "online", "sleeping", "UTC", NOW)
+    assert "<@42>" not in message
+    assert "sleeping" in message
+    # recovery: no ping either
+    message = render_message(watch, "transition", "offline", "online", "UTC", NOW)
+    assert "<@42>" not in message
+    # still-offline re-alert keeps pinging
+    message = render_message(watch, "realert", "offline", "offline", "UTC", NOW)
+    assert "<@42>" in message
+
+
 def test_render_custom_template_with_unknown_placeholder():
     watch = make_watch(message_template="{name} went {to_state} at {time} {bogus}")
     message = render_message(watch, "transition", "online", "offline", "UTC", NOW)

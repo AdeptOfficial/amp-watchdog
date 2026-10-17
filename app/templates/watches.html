@@ -1,41 +1,41 @@
 {% extends "base.html" %}
-{% block title %}Watches · amp-watchdog{% endblock %}
+{% block title %}watches — amp-watchdog{% endblock %}
+{% block motd %}adept@lab:~$ vim watchlist{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">Watches</h1>
-
-<div id="discover-panel" class="mb-4"
+<div id="discover-panel"
      hx-get="/api/amp/instances"
      hx-trigger="load, refresh-discover from:body"
      hx-swap="innerHTML">
-    <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-sm text-gray-500">
-        Discovering instances from AMP…
+    <section class="card"><p class="empty">Discovering instances from AMP…</p></section>
+</div>
+
+<section class="card">
+    <h2>// watches</h2>
+    <div class="tblwrap">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Instance</th>
+                    <th>Interval</th>
+                    <th>Alerts on</th>
+                    <th>Channels</th>
+                    <th class="num"></th>
+                </tr>
+            </thead>
+            <tbody id="watch-rows"
+                   hx-get="/partials/watch-rows"
+                   hx-trigger="refresh-watches from:body"
+                   hx-swap="innerHTML">
+                {% include "components/watch_rows.html" %}
+            </tbody>
+        </table>
     </div>
-</div>
+</section>
 
-<div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
-    <table class="w-full text-sm">
-        <thead class="text-gray-400 text-left">
-            <tr class="border-b border-gray-700">
-                <th class="px-4 py-3">Name</th>
-                <th class="px-4 py-3">Instance</th>
-                <th class="px-4 py-3">Interval</th>
-                <th class="px-4 py-3">Alerts on</th>
-                <th class="px-4 py-3">Channels</th>
-                <th class="px-4 py-3"></th>
-            </tr>
-        </thead>
-        <tbody id="watch-rows"
-               hx-get="/partials/watch-rows"
-               hx-trigger="refresh-watches from:body"
-               hx-swap="innerHTML">
-            {% include "components/watch_rows.html" %}
-        </tbody>
-    </table>
-</div>
+<div id="watch-edit-panel"></div>
 
-<div id="watch-edit-panel" class="mt-4"></div>
-
-<p class="mt-6 text-xs text-gray-500">
+<p class="hint">
     Alert rules fire on changes between stable states (online / sleeping / offline). Transitional
     states like Starting or Restarting never alert, so routine restarts stay quiet.
 </p>

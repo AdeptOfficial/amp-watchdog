@@ -1,50 +1,48 @@
 {% extends "base.html" %}
-{% block title %}Channels · amp-watchdog{% endblock %}
+{% block title %}channels — amp-watchdog{% endblock %}
+{% block motd %}adept@lab:~$ cat channels.conf{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">Notification channels</h1>
+<section class="card">
+    <h2>// notification channels</h2>
+    <div class="tblwrap">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Last test</th>
+                    <th class="num"></th>
+                </tr>
+            </thead>
+            <tbody id="channel-rows" hx-swap="innerHTML">
+                {% include "components/channel_rows.html" %}
+            </tbody>
+        </table>
+    </div>
+</section>
 
-<div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 mb-6">
-    <table class="w-full text-sm">
-        <thead class="text-gray-400 text-left">
-            <tr class="border-b border-gray-700">
-                <th class="px-4 py-3">Name</th>
-                <th class="px-4 py-3">Type</th>
-                <th class="px-4 py-3">Last test</th>
-                <th class="px-4 py-3"></th>
-            </tr>
-        </thead>
-        <tbody id="channel-rows" hx-swap="innerHTML">
-            {% include "components/channel_rows.html" %}
-        </tbody>
-    </table>
-</div>
-
-<div id="channel-edit-panel" class="mb-6"></div>
+<div id="channel-edit-panel"></div>
 
 {% for plugin in notifiers %}
-<div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-4">
-    <h2 class="font-semibold mb-2">Add {{ plugin.display_name }}</h2>
-    <form hx-post="/api/channels" hx-target="#channel-rows" hx-swap="innerHTML" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+<section class="card">
+    <h2>// add {{ plugin.display_name | lower }}</h2>
+    <form hx-post="/api/channels" hx-target="#channel-rows" hx-swap="innerHTML" class="formgrid">
         <input type="hidden" name="type" value="{{ plugin.type }}">
-        <label class="block">
-            <span class="text-gray-400">Name</span>
-            <input name="name" placeholder="e.g. game-alerts" required
-                   class="mt-1 w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5">
+        <label class="field">Name
+            <input name="name" placeholder="e.g. game-alerts" required>
         </label>
         {% for f in plugin.config_fields %}
-        <label class="block">
-            <span class="text-gray-400">{{ f.label }}</span>
+        <label class="field">{{ f.label }}
             <input name="config_{{ f.name }}" type="{{ f.input_type }}" placeholder="{{ f.placeholder }}"
-                   {% if f.required %}required{% endif %}
-                   class="mt-1 w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5">
+                   {% if f.required %}required{% endif %}>
         </label>
         {% endfor %}
-        <div class="md:col-span-2">
-            <button type="submit" class="px-4 py-2 rounded bg-green-700 hover:bg-green-600 font-medium">Add channel</button>
+        <div class="wide">
+            <button type="submit" class="btn primary">add channel</button>
         </div>
     </form>
-</div>
+</section>
 {% endfor %}
 
-<p class="text-xs text-gray-500">More channel types (ntfy, email) plug in as notifier modules — their forms appear here automatically.</p>
+<p class="hint">More channel types (ntfy, email) plug in as notifier modules — their forms appear here automatically.</p>
 {% endblock %}

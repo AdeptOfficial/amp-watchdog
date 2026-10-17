@@ -1,37 +1,42 @@
-<div class="bg-gray-800 rounded-lg border border-gray-700 p-4">
-    <div class="flex items-center justify-between mb-2">
-        <h2 class="font-semibold">Instances on AMP</h2>
-        <button hx-get="/api/amp/instances" hx-target="#discover-panel" hx-swap="innerHTML"
-                class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">Refresh</button>
+<section class="card">
+    <div class="card-head">
+        <h2>// instances on AMP</h2>
+        <button class="btn mini" hx-get="/api/amp/instances"
+                hx-target="#discover-panel" hx-swap="innerHTML">refresh</button>
     </div>
     {% if error %}
-    <p class="text-red-400 text-sm">{{ error }}</p>
+    <p class="banner">{{ error }}</p>
     {% else %}
-    <table class="w-full text-sm">
-        {% for t in targets %}
-        <tr class="border-b border-gray-700/50">
-            <td class="py-2 font-medium">
-                {{ t.name }}
-                {% if t.meta.get('module') == 'ADS' %}<span class="ml-1 text-xs text-gray-500">(controller)</span>{% endif %}
-            </td>
-            <td class="py-2 text-gray-400">{{ t.meta.get('instance_name') }}</td>
-            <td class="py-2 text-gray-400">{{ t.meta.get('app_state_name') }}</td>
-            <td class="py-2 text-right">
-                {% if t.target_key in watched_keys %}
-                <span class="text-xs text-green-500">watching ✓</span>
-                {% else %}
-                <form hx-post="/api/watches" hx-swap="none" class="inline">
-                    <input type="hidden" name="target_key" value="{{ t.target_key }}">
-                    <input type="hidden" name="name" value="{{ t.name }}">
-                    <input type="hidden" name="instance_name" value="{{ t.meta.get('instance_name') }}">
-                    <button type="submit" class="px-2 py-1 text-xs rounded bg-green-700 hover:bg-green-600">Watch</button>
-                </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% else %}
-        <tr><td class="py-2 text-gray-500">No instances visible — check the AMP account's per-instance Manage permissions.</td></tr>
-        {% endfor %}
-    </table>
+    <div class="tblwrap">
+        <table class="tbl">
+            {% for t in targets %}
+            <tr>
+                <td class="name">
+                    {{ t.name }}
+                    {% if t.meta.get('module') == 'ADS' %}<span class="badge">controller</span>{% endif %}
+                </td>
+                <td class="sub">{{ t.meta.get('instance_name') }}</td>
+                {% set st = t.meta.get('app_state_name') %}
+                <td class="sub">{{ '—' if not st or st == 'Undefined' else st }}</td>
+                <td class="num">
+                    {% if t.meta.get('module') == 'ADS' %}
+                    <span class="sub when" title="The panel itself — amp-watchdog talks to it, so it can't meaningfully watch it">always on</span>
+                    {% elif t.target_key in watched_keys %}
+                    <span class="ok when">watching ✓</span>
+                    {% else %}
+                    <form hx-post="/api/watches" hx-swap="none" style="display:inline">
+                        <input type="hidden" name="target_key" value="{{ t.target_key }}">
+                        <input type="hidden" name="name" value="{{ t.name }}">
+                        <input type="hidden" name="instance_name" value="{{ t.meta.get('instance_name') }}">
+                        <button type="submit" class="btn mini primary">watch</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td class="empty">No instances visible — check the AMP account's per-instance Manage permissions.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
     {% endif %}
-</div>
+</section>

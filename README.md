@@ -27,7 +27,7 @@ AMP-managed game servers can't be monitored from the outside: AMP holds the game
 
 ## Stack
 
-FastAPI · SQLAlchemy 2 (async, SQLite) · htmx + Tailwind (CDN, no build step) · SSE · Docker
+FastAPI · SQLAlchemy 2 (async, SQLite) · htmx + hand-rolled AdepT token CSS (no build step, no CDN styles) · SSE · Docker
 
 ## Quick start
 

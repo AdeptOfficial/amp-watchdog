@@ -1,6 +1,6 @@
 # Claude Context: amp-watchdog
 
-Watchlist status monitor for CubeCoders AMP instances. FastAPI + async SQLAlchemy/SQLite + htmx/Tailwind-CDN + SSE, Docker-deployed.
+Watchlist status monitor for CubeCoders AMP instances. FastAPI + async SQLAlchemy/SQLite + htmx + vanilla AdepT token CSS (`app/static/style.css` — branding rules in `~/git/AGENTS.md`, canonical doc `~/git/adeptproductions/branding/README.md`) + SSE, Docker-deployed.
 
 ## Startup
 

@@ -3,9 +3,11 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from app.checkers import load_checkers
 from app.clients.amp import close_amp_client
@@ -55,6 +57,8 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+app.mount("/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
 
 app.include_router(api_router)
 app.include_router(partials_router)

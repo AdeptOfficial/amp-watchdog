@@ -29,6 +29,9 @@ def render_message(
 ) -> str:
     template = (watch.message_template or "").strip() or DEFAULT_TEMPLATE
     local = now.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(tz_name))
+    # {mention} only pings for transitions INTO offline (and still-offline re-alerts):
+    # going down is the act-now event; sleep cycles and recoveries stay ping-free.
+    mention = f"<@{watch.mention_id}>" if watch.mention_id and to_bucket == "offline" else ""
     values = _SafeDict(
         name=watch.display_name,
         instance=(watch.config or {}).get("instance_name", watch.target_key),
@@ -36,7 +39,7 @@ def render_message(
         to_state=to_bucket,
         app_state=watch.last_app_state_name or "Unknown",
         time=local.strftime("%H:%M"),
-        mention=f"<@{watch.mention_id}>" if watch.mention_id else "",
+        mention=mention,
         emoji=_EMOJI.get(to_bucket, ""),
     )
     message = template.format_map(values).strip()

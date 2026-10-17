@@ -1,30 +1,30 @@
 {% for w in watches %}
-<tr class="border-b border-gray-700/50">
-    <td class="px-4 py-3 font-medium {% if not w.enabled %}opacity-40{% endif %}">
+<tr>
+    <td class="name {{ '' if w.enabled else 'dim' }}">
         {{ w.display_name }}
-        {% if not w.enabled %}<span class="ml-1 px-1.5 py-0.5 text-xs bg-gray-700 text-gray-400 rounded">paused</span>{% endif %}
+        {% if not w.enabled %}<span class="badge">paused</span>{% endif %}
     </td>
-    <td class="px-4 py-3 text-gray-400 {% if not w.enabled %}opacity-40{% endif %}">{{ (w.config or {}).get('instance_name') or w.target_key }}</td>
-    <td class="px-4 py-3 text-gray-400 {% if not w.enabled %}opacity-40{% endif %}">{{ w.check_interval_seconds }}s</td>
-    <td class="px-4 py-3 text-xs text-gray-400 {% if not w.enabled %}opacity-40{% endif %}">
+    <td class="sub {{ '' if w.enabled else 'dim' }}">{{ (w.config or {}).get('instance_name') or w.target_key }}</td>
+    <td class="sub {{ '' if w.enabled else 'dim' }}">{{ w.check_interval_seconds }}s</td>
+    <td class="when {{ '' if w.enabled else 'dim' }}">
         {% set active_rules = (w.notify_rules or {}).items() | selectattr(1) | map(attribute=0) | list %}
         {{ active_rules | join(', ') if active_rules else 'nothing' }}
-        {% if w.realert_minutes %}<span class="text-amber-400"> · re-alert {{ w.realert_minutes }}m</span>{% endif %}
-        {% if w.quiet_start and w.quiet_end %}<span class="text-blue-400"> · quiet {{ w.quiet_start }}–{{ w.quiet_end }}</span>{% endif %}
+        {% if w.realert_minutes %}<span class="state sleeping"> · re-alert {{ w.realert_minutes }}m</span>{% endif %}
+        {% if w.quiet_start and w.quiet_end %}<span class="state transitional"> · quiet {{ w.quiet_start }}–{{ w.quiet_end }}</span>{% endif %}
     </td>
-    <td class="px-4 py-3 text-gray-400 {% if not w.enabled %}opacity-40{% endif %}">{{ (w.channel_ids or []) | length }}</td>
-    <td class="px-4 py-3 text-right whitespace-nowrap">
-        <button hx-get="/api/watches/{{ w.id }}/edit" hx-target="#watch-edit-panel" hx-swap="innerHTML"
-                class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">Edit</button>
-        <button hx-post="/api/watches/{{ w.id }}/toggle" hx-target="#watch-rows" hx-swap="innerHTML"
-                class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">
-            {{ 'Pause' if w.enabled else 'Resume' }}
-        </button>
-        <button hx-delete="/api/watches/{{ w.id }}" hx-target="#watch-rows" hx-swap="innerHTML"
-                hx-confirm="Remove watch '{{ w.display_name }}' and its history?"
-                class="px-2 py-1 text-xs rounded bg-red-900 hover:bg-red-800">Delete</button>
+    <td class="sub {{ '' if w.enabled else 'dim' }}">{{ (w.channel_ids or []) | length }}</td>
+    <td class="num">
+        <span class="actions">
+            <button class="btn mini" hx-get="/api/watches/{{ w.id }}/edit"
+                    hx-target="#watch-edit-panel" hx-swap="innerHTML">edit</button>
+            <button class="btn mini" hx-post="/api/watches/{{ w.id }}/toggle"
+                    hx-target="#watch-rows" hx-swap="innerHTML">{{ 'pause' if w.enabled else 'resume' }}</button>
+            <button class="btn mini danger" hx-delete="/api/watches/{{ w.id }}"
+                    hx-target="#watch-rows" hx-swap="innerHTML"
+                    hx-confirm="Remove watch '{{ w.display_name }}' and its history?">delete</button>
+        </span>
     </td>
 </tr>
 {% else %}
-<tr><td colspan="6" class="px-4 py-4 text-gray-500 text-sm">No watches yet — use “Add watch” above.</td></tr>
+<tr><td colspan="6" class="empty">No watches yet — pick an instance above.</td></tr>
 {% endfor %}

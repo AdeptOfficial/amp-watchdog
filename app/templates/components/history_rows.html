@@ -1,19 +1,19 @@
 {% for t in transitions %}
-<tr class="border-b border-gray-700/50">
-    <td class="px-4 py-2 text-gray-400"><span class="local-time" data-utc="{{ iso(t.created_at) }}"></span></td>
-    <td class="px-4 py-2">{{ names.get(t.watch_id, '#' ~ t.watch_id) }}</td>
-    <td class="px-4 py-2">
-        <span class="capitalize">{{ t.from_bucket }}</span>
-        <span class="text-gray-500">→</span>
-        <span class="capitalize font-medium">{{ t.to_bucket }}</span>
-        <span class="text-gray-500 text-xs">({{ t.to_state_name or '?' }})</span>
+<tr>
+    <td class="when"><span class="local-time" data-utc="{{ iso(t.created_at) }}"></span></td>
+    <td>{{ names.get(t.watch_id, '#' ~ t.watch_id) }}</td>
+    <td>
+        <span class="state {{ t.from_bucket }}">{{ t.from_bucket }}</span>
+        <span class="sub">→</span>
+        <span class="state {{ t.to_bucket }}">{{ t.to_bucket }}</span>
+        <span class="sub when">({{ t.to_state_name or '?' }})</span>
     </td>
-    <td class="px-4 py-2 text-xs">
-        {% if t.notified %}<span class="text-green-400">sent</span>
-        {% elif t.suppress_reason %}<span class="text-gray-500">{{ t.suppress_reason }}</span>
-        {% else %}<span class="text-gray-500">—</span>{% endif %}
+    <td>
+        {% if t.notified %}<span class="ok">sent</span>
+        {% elif t.suppress_reason %}<span class="sub when">{{ t.suppress_reason }}</span>
+        {% else %}<span class="sub">—</span>{% endif %}
     </td>
 </tr>
 {% else %}
-<tr><td colspan="4" class="px-4 py-4 text-gray-500 text-sm">No transitions recorded yet.</td></tr>
+<tr><td colspan="4" class="empty">No transitions recorded yet.</td></tr>
 {% endfor %}

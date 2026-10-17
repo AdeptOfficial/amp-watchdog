@@ -1,0 +1,146 @@
+/* amp-watchdog — AdepT design tokens (canonical: adeptproductions/branding) */
+:root {
+  --base: #0a1014; --surface: #0e151b; --card: #111a21; --line: #203039;
+  --ink: #eff8fa; --muted: #aec3cd; --faint: #7e95a0;
+  --signal: #3fd4e6; --magenta: #e359c9; --crimson: #f0597f; --matrix: #3fe0a8;
+  --ice: #a6eaf5; --scarf: #dfa35c;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--base); color: var(--ink);
+  font-family: var(--mono); font-size: 14px; line-height: 1.5;
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+
+header {
+  display: flex; align-items: center; gap: 12px;
+  height: 56px; padding: 0 24px; border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--base) 92%, transparent);
+  backdrop-filter: blur(6px);
+}
+.mark { width: 26px; height: 26px; display: block; }
+h1 { font-size: 15px; letter-spacing: .25em; text-transform: uppercase; margin: 0; }
+.plain { color: inherit; text-decoration: none; }
+nav { margin-left: auto; display: flex; gap: 18px; align-items: center; }
+nav a {
+  color: var(--faint); text-decoration: none; font-size: 11.5px;
+  letter-spacing: .2em; text-transform: uppercase;
+}
+nav a:hover { color: var(--ink); }
+nav a.active { color: var(--signal); }
+
+main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 24px 16px 60px;
+  display: grid; gap: 20px; align-content: start; flex: 1; }
+.motd { margin: 0; color: var(--faint); font-size: 12px; letter-spacing: .08em;
+  display: flex; align-items: center; gap: 10px; }
+.cursor { color: var(--signal); animation: blink 1.1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.card { border: 1px solid var(--line); background: var(--card); padding: 18px 20px; }
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  margin-bottom: 14px; }
+.card-head h2 { margin: 0; }
+h2 { font-size: 12px; letter-spacing: .25em; text-transform: uppercase; color: var(--signal); margin: 0 0 12px; }
+
+/* tables */
+.tblwrap { overflow-x: auto; }
+table.tbl { width: 100%; border-collapse: collapse; min-width: 720px; }
+.tbl th {
+  text-align: left; color: var(--faint); font-weight: 400;
+  font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase;
+  padding: 8px 10px; border-bottom: 1px solid var(--line);
+}
+.tbl td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl .num, .tbl th.num { text-align: right; }
+.dim { opacity: .45; }
+.name { font-weight: 700; }
+.sub { color: var(--faint); }
+.when { color: var(--faint); font-size: 11.5px; }
+.empty { padding: 24px 10px; text-align: center; color: var(--faint); }
+
+/* status lights: square, terminal style */
+.light { display: inline-block; width: 10px; height: 10px; margin-right: 8px;
+  vertical-align: -1px; background: var(--faint); }
+.light.online { background: var(--matrix); }
+.light.sleeping { background: var(--scarf); }
+.light.offline { background: var(--crimson); }
+.light.transitional { background: var(--signal); animation: blink .9s steps(1) infinite; }
+.light.unknown { background: var(--faint); }
+.light.live { background: var(--matrix); animation: pulse 1.6s ease-in-out infinite; }
+.light.lost { background: var(--scarf); }
+@keyframes pulse { 50% { opacity: .35; } }
+.state { letter-spacing: .06em; }
+.state.online { color: var(--matrix); }
+.state.sleeping { color: var(--scarf); }
+.state.offline { color: var(--crimson); font-weight: 700; }
+.state.transitional { color: var(--signal); }
+.state.unknown { color: var(--faint); }
+.err { color: var(--crimson); font-size: 11.5px; }
+
+.badge {
+  display: inline-block; margin-left: 8px; padding: 1px 6px;
+  border: 1px solid var(--line); color: var(--faint);
+  font-size: 10px; letter-spacing: .15em; text-transform: uppercase;
+}
+.ok { color: var(--matrix); }
+.fail { color: var(--crimson); }
+
+/* buttons */
+.btn {
+  background: var(--surface); color: var(--muted); border: 1px solid var(--line);
+  font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase;
+  padding: 8px 14px; cursor: pointer; transition: all .15s; position: relative;
+}
+.btn:hover { border-color: var(--signal); color: var(--ink); }
+.btn.primary {
+  background: color-mix(in srgb, var(--signal) 10%, transparent);
+  color: var(--signal); border-color: var(--signal); font-weight: 700;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--signal) 50%, transparent);
+}
+.btn.primary:hover {
+  background: var(--signal); color: var(--base); text-shadow: none;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--signal) 40%, transparent);
+}
+.btn.mini { padding: 4px 8px; font-size: 10.5px; }
+.btn.danger:hover { border-color: var(--crimson); color: var(--crimson); }
+.btn:disabled { opacity: .3; cursor: default; }
+.btn:disabled:hover { border-color: var(--line); color: var(--muted); }
+.actions { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
+
+/* forms */
+input, textarea, select {
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  font: inherit; padding: 6px 8px; width: 100%;
+}
+textarea { font-size: 12px; resize: vertical; }
+input[type="checkbox"] { accent-color: var(--signal); width: 15px; height: 15px; }
+.formgrid { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+.formgrid .wide { grid-column: 1 / -1; }
+@media (max-width: 760px) { .formgrid { grid-template-columns: 1fr; } }
+label.field { display: grid; gap: 5px; color: var(--muted); font-size: 12px; align-content: start; }
+label.check { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 12px; }
+label.check input { width: 15px; }
+.checkgrid { display: grid; gap: 6px; grid-template-columns: 1fr 1fr; margin-top: 5px; }
+.hint { color: var(--faint); font-size: 11.5px; margin: 4px 0 0; }
+.close { background: none; border: none; color: var(--faint); font: inherit; cursor: pointer;
+  font-size: 12px; letter-spacing: .1em; }
+.close:hover { color: var(--ink); }
+.editcard { border-color: color-mix(in srgb, var(--signal) 45%, var(--line)); }
+.banner { color: var(--crimson); font-size: 12px; padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--crimson) 40%, var(--line)); margin-bottom: 10px; }
+
+footer {
+  text-align: center; color: var(--faint); font-size: 11px; letter-spacing: .12em;
+  padding: 20px 24px; border-top: 1px solid var(--line);
+}
+.sig { color: var(--magenta); }
+
+/* htmx feedback: busy buttons blink the cursor */
+form.htmx-request .btn, .btn.htmx-request { opacity: .55; pointer-events: none; }
+form.htmx-request .btn::after, .btn.htmx-request::after {
+  content: " ▋"; color: var(--signal); animation: blink .7s steps(1) infinite; }
+tbody.htmx-settling tr { background: color-mix(in srgb, var(--signal) 7%, transparent); transition: none; }
+tbody tr { transition: background .9s ease; }
