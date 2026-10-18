@@ -67,6 +67,9 @@ async def run_migrations(conn):
         "channels": {
             "test_message": ("TEXT", "NULL"),
         },
+        "watches": {
+            "ping_fail_count": ("INTEGER", "0"),
+        },
     }
 
     for table_name, columns in migrations.items():

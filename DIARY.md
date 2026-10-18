@@ -1,5 +1,66 @@
 # amp-watchdog Development Diary
 
+## 2026-10-17: Production cutover and internal HTTPS hostname
+
+- User authorized production, selected the recommended amp-watch.internal.adeptlab.dev
+  hostname, and requested documentation, commits and pushes.
+- Built image `amp-watchdog:liveness-20261017` on prod LXC 112; all 65 tests passed
+  inside that exact image without network/live data. Includes the liveness checker,
+  persisted failure count, edit fields, migration and stricter response validation.
+- Transferred existing credentials and database privately; retained the original
+  dev copy and a pre-start production data backup. Stopped dev before starting prod
+  to avoid duplicate app notifications. No game-server restart or manual test alert.
+- NPM host 18 proxies HTTPS to 10.0.1.12:8200 using existing wildcard certificate 7;
+  wildcard DNS already resolved to private 10.0.0.30. No public tunnel added.
+- Verified trusted HTTPS, HTTP redirect, health, homepage, SSE and SQLite integrity.
+  Both enabled watches completed production checks with zero probe/backend errors.
+- AMP panel-unreachable alert and quiet-hours digest remain future work. Existing
+  n8n workflows were not changed; predecessor retirement is separately tracked.
+
+
+## 2026-10-17: Liveness fix independently reviewed and tested
+
+- Confirmed the dev container already contains the liveness probe/checker and
+  returns a healthy API response. Read-only aggregate checks found 2 enabled
+  watches, both with ping targets, both sleeping with zero ping failures.
+- Existing 60 tests passed in the Python 3.12 app image with current source
+  mounted read-only, isolated in-memory SQLite and external networking disabled.
+- Added scheduler integration coverage: first failure persists without an alert,
+  second failure dispatches an offline mention, continued failure does not repeat
+  the transition, and successful recovery resets the count and sends no mention
+  when the recovery rule is enabled. Notification dispatch is captured, not sent.
+- Found that the probe accepted empty/non-object/invalid JSON and inconsistent
+  frame lengths as alive. Added failing regressions, then bounded and validated
+  the response frame and JSON object. Full suite: 65 passed (one existing
+  Pydantic configuration deprecation warning).
+- Response-validation hardening and new tests are local only. No deployment,
+  live outage injection, game-server restart, or Discord test message performed.
+  This run did not independently re-prove live AMP sleep/wake semantics.
+
+
+## 2026-10-17: Liveness ping — close the wedged-sleep-listener blind spot
+
+- Root cause (LYD incident, same day): AMP's wake-on-connect sleep listener can wedge —
+  port open, no SLP response, AMP still reports AppState 50/Sleeping. `GetInstances`
+  alone is structurally blind to it; all three monitors stayed silent.
+- New `app/core/mcping.py`: async Minecraft server-list-ping probe. A completed
+  handshake + status response is the only pass — bare TCP connect deliberately
+  doesn't count (the wedged listener accepts connects). Verified on AMP 2.8.0.8:
+  a status ping does NOT wake a sleeping instance; both online and sleeping answer.
+- AMP checker: watches may set `ping_host`/`ping_port` in `config` (edit form fields).
+  When AMP claims online/sleeping AND a target is set, both sources must agree.
+  `PING_FAIL_THRESHOLD` (2) consecutive failures → bucket overridden to offline,
+  state name "<State> (port dead)" — rides the normal transition/alert machinery,
+  so `sleeping->offline` fires Discord with zero evaluator changes. Threshold >1 so
+  a wake/sleep handover blip never alerts; transitional states are never probed and
+  preserve the failure streak.
+- New runtime column `ping_fail_count` (add-column migration). New settings
+  `PING_TIMEOUT_SECONDS=5`, `PING_FAIL_THRESHOLD=2`.
+- Tests: `tests/test_mcping.py` — real asyncio socket servers for the probe (incl.
+  the accepts-then-silence wedge shape) + checker override/reset/skip logic. 60 pass.
+  Gotcha: Python 3.12's `Server.wait_closed()` waits for handlers, so the stalling
+  handler must self-close and teardown caps the wait.
+
 ## 2026-10-17: Chrome standard + discover-list polish
 
 - Shared app chrome per branding doc: header exactly 56px, footer `20px 24px` with

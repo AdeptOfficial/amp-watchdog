@@ -146,6 +146,16 @@ async def update_watch(watch_id: int, request: Request, db: AsyncSession = Depen
         watch.quiet_end = str(form.get("quiet_end", "")).strip() or None
         watch.notify_rules = {key: (f"rule__{key}" in form) for key in RULE_KEYS}
         watch.channel_ids = [int(v) for v in form.getlist("channels") if str(v).isdigit()]
+        # Liveness ping target lives in config; reassign the dict so the JSON
+        # column registers the change. Any edit resets the failure streak.
+        ping_host = str(form.get("ping_host", "")).strip()
+        ping_port = str(form.get("ping_port", "")).strip()
+        config = {k: v for k, v in (watch.config or {}).items() if k not in ("ping_host", "ping_port")}
+        if ping_host and ping_port.isdigit() and 0 < int(ping_port) < 65536:
+            config["ping_host"] = ping_host
+            config["ping_port"] = int(ping_port)
+        watch.config = config
+        watch.ping_fail_count = 0
         await db.commit()
     return await _watch_rows(request, db)
 

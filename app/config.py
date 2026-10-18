@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     SCHEDULER_TICK: int = 5
     DEFAULT_CHECK_INTERVAL: int = 60
 
+    # Liveness ping (Minecraft SLP cross-check on watches that configure one):
+    # consecutive failures before an online/sleeping instance is declared
+    # offline ("port dead"). >1 so a wake/sleep handover blip never alerts.
+    PING_TIMEOUT_SECONDS: float = 5.0
+    PING_FAIL_THRESHOLD: int = 2
+
     class Config:
         env_file = ".env"
         extra = "ignore"

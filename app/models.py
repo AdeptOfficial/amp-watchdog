@@ -63,6 +63,9 @@ class Watch(Base):
     next_check_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     consecutive_errors: Mapped[int] = mapped_column(Integer, default=0)
     last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Consecutive liveness-ping failures (ping target lives in config as
+    # ping_host/ping_port); at PING_FAIL_THRESHOLD the checker reports offline
+    ping_fail_count: Mapped[int] = mapped_column(Integer, default=0)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 

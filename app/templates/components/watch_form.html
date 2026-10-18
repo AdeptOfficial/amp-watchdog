@@ -46,6 +46,20 @@
             <input name="realert_minutes" type="number" min="0" value="{{ watch.realert_minutes }}">
         </label>
 
+        <div class="formgrid" style="grid-template-columns: 2fr 1fr; gap: 10px;">
+            <label class="field">Liveness ping host (optional)
+                <input name="ping_host" value="{{ (watch.config or {}).get('ping_host', '') }}"
+                       placeholder="10.0.1.52">
+            </label>
+            <label class="field">Port
+                <input name="ping_port" type="number" min="1" max="65535"
+                       value="{{ (watch.config or {}).get('ping_port', '') }}" placeholder="31575">
+            </label>
+        </div>
+        <span class="hint">Minecraft status ping against the game port. Catches a wedged
+            wake-on-connect listener: if AMP claims online/sleeping but the port stops answering,
+            the watch goes offline ("port dead"). Leave blank for non-Minecraft instances.</span>
+
         <div class="formgrid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
             <label class="field">Quiet from
                 <input name="quiet_start" type="time" value="{{ watch.quiet_start or '' }}">

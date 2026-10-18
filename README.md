@@ -2,7 +2,7 @@
 
 Watchlist-based status monitor for [CubeCoders AMP](https://cubecoders.com/AMP) game-server instances, with a web UI and pluggable notifications.
 
-AMP-managed game servers can't be monitored from the outside: AMP holds the game port even while an instance is stopped or sleeping, and hardened servers (`enable-status=false`) ignore status pings entirely. amp-watchdog asks AMP itself — the only source that knows the difference between **online**, **sleeping** (wake-on-connect), and **offline**.
+AMP supplies the **online**, **sleeping** and **offline** state. Optional Minecraft server-list pings cross-check online/sleeping claims to catch a wedged wake-on-connect listener. A bare TCP connection is insufficient: the probe requires a complete, bounded status frame containing a JSON object. Leave probes disabled on servers that intentionally disable status responses (`enable-status=false`).
 
 ## Features
 
@@ -23,7 +23,30 @@ AMP-managed game servers can't be monitored from the outside: AMP holds the game
 | AMP checker | ✅ Login/session cache/re-login, batched GetInstances |
 | Discord notifier | ✅ |
 | ntfy / email notifiers | Planned (plugin slots ready) |
-| Deployed | DEV LXC 212 @ 10.0.2.12:8200 |
+| Deployed | Internal production: https://amp-watch.internal.adeptlab.dev (LAN/Tailscale) |
+
+## Liveness checks
+
+Set the Minecraft host and port in a watch's edit form. Two failed checks override
+an online/sleeping AMP state to offline; a successful response resets the failure
+count. Existing quiet hours, transition rules and offline re-alerts still apply.
+Recovery notifications require the corresponding rule (offline → sleeping is off
+by default). Offline messages may mention you; recovery messages do not.
+
+The probe sends a status handshake, not a join. Healthy sleeping listeners answered
+without waking on the AMP version tested; recheck this behavior after AMP upgrades.
+It detects failure, but does not restart a game server or prove players can join.
+
+## Operations
+
+Production runs on LXC 112 at port 8200 behind the internal NPM HTTPS hostname.
+Source: `/opt/amp-watchdog`; database: `/opt/appdata/amp-watchdog/watchdog.db`.
+The former dev instance on LXC 212 is stopped to prevent duplicate alerts. Do not
+restart it with production notification channels enabled. `scripts/deploy.sh`
+still targets dev only. Production instructions and rollback are recorded in the
+homeserver repository at `configs/prod/services/amp-watchdog/README.md`.
+
+No public tunnel is configured for this unauthenticated internal app.
 
 ## Stack
 

@@ -20,9 +20,11 @@ Watchlist status monitor for CubeCoders AMP instances. FastAPI + async SQLAlchem
 
 - No auth on the app ("the network is the auth") — internal LAN/Tailscale only, never expose via tunnel.
 - Secrets only in `.env` (gitignored). Channel webhook URLs live in the DB — the repo is public, never commit a real webhook URL, `.env`, or dumps of `watchdog.db`.
-- Deploy: `scripts/deploy.sh` → dev LXC 212 (10.0.2.12:8200). Prod requires explicit user approval.
+- Production: LXC 112, https://amp-watch.internal.adeptlab.dev (LAN/Tailscale), source `/opt/amp-watchdog`. Updates still require explicit production authorization.
+- `scripts/deploy.sh` targets dev LXC 212, currently stopped after cutover. Never restart the copied production channels on dev alongside production; use isolated test settings.
 - Run `pytest` before any deploy.
 
 ## Infra docs
 
-Homeserver repo: `configs/dev/services/amp-watchdog/README.md` (deploy notes), `context/domains/amp-watchdog.md` (AMP API facts), `docs/game-servers.md` § Status Monitoring.
+Homeserver repo: `configs/prod/services/amp-watchdog/README.md` (production/rollback),
+`configs/dev/services/amp-watchdog/README.md` (stopped dev), `context/domains/amp-watchdog.md` (AMP API facts), `docs/game-servers.md` § Status Monitoring.
