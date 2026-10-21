@@ -49,7 +49,7 @@
         <div class="formgrid" style="grid-template-columns: 2fr 1fr; gap: 10px;">
             <label class="field">Liveness ping host (optional)
                 <input name="ping_host" value="{{ (watch.config or {}).get('ping_host', '') }}"
-                       placeholder="10.0.1.52">
+                       placeholder="amp.example.lan">
             </label>
             <label class="field">Port
                 <input name="ping_port" type="number" min="1" max="65535"

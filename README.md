@@ -23,7 +23,7 @@ AMP supplies the **online**, **sleeping** and **offline** state. Optional Minecr
 | AMP checker | ✅ Login/session cache/re-login, batched GetInstances |
 | Discord notifier | ✅ |
 | ntfy / email notifiers | Planned (plugin slots ready) |
-| Deployed | Internal production: https://amp-watch.internal.adeptlab.dev (LAN/Tailscale) |
+| Deployed | Internal production: https://<internal-hostname> (LAN/Tailscale) |
 
 ## Liveness checks
 
@@ -39,10 +39,10 @@ It detects failure, but does not restart a game server or prove players can join
 
 ## Operations
 
-Production runs on LXC 112 at port 8200 behind the internal NPM HTTPS hostname.
+Production runs on LXC <dashboard-prod> at port 8200 behind the internal NPM HTTPS hostname.
 Source: `/opt/amp-watchdog`; database: `/opt/appdata/amp-watchdog/watchdog.db`.
-The former dev instance on LXC 212 is stopped to prevent duplicate alerts. Do not
-restart it with production notification channels enabled. `scripts/deploy.sh`
+The former dev instance on LXC <dashboard-dev> is stopped to prevent duplicate alerts. Do not
+restart it with production notification channels enabled. `ops/deploy-dev.sh`
 still targets dev only. Production instructions and rollback are recorded in the
 homeserver repository at `configs/prod/services/amp-watchdog/README.md`.
 

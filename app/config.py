@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./data/watchdog.db"
 
     # AMP ADS panel + read-only service account
-    AMP_BASE_URL: str = "http://10.0.1.52:8080"
+    AMP_BASE_URL: str = "http://amp.example.lan:8080"
     AMP_USERNAME: str = "status-reader"
     AMP_PASSWORD: str = ""
 

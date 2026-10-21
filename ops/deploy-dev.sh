@@ -1,18 +1,18 @@
 #!/bin/bash
-# Deploy amp-watchdog to dev server (LXC 212, dashboard-dev)
+# Deploy amp-watchdog to dev server (LXC <dashboard-dev>, dashboard-dev)
 #
 # Usage: ./scripts/deploy.sh
 #
 # Prerequisites:
-#   - SSH access to dev Proxmox host (10.0.2.10)
-#   - LXC 212 running with Docker
+#   - SSH access to dev Proxmox host (<dev-proxmox>)
+#   - LXC <dashboard-dev> running with Docker
 #   - First deploy only: create /opt/amp-watchdog and /opt/appdata/amp-watchdog
 #     in the LXC and place a filled .env at /opt/amp-watchdog/.env
 
 set -e
 
-PROXMOX_HOST="root@10.0.2.10"
-LXC_ID="212"
+PROXMOX_HOST="${PROXMOX_HOST:?set PROXMOX_HOST, e.g. root@<dev-proxmox> (values: homeserver configs/dev/services/<app>/README.md)}"
+LXC_ID="${LXC_ID:?set LXC_ID of the dev container (see homeserver dev service README)}"
 REMOTE_PATH="/opt/amp-watchdog"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -49,5 +49,5 @@ rm -f "$TARBALL"
 
 echo ""
 echo "=== Deploy Complete ==="
-echo "Dashboard:  http://10.0.2.12:8200"
+echo "Dashboard:  http://<container-ip>:${DASHBOARD_PORT:-8200}"
 echo "Check logs: ssh $PROXMOX_HOST \"pct exec $LXC_ID -- docker logs amp-watchdog -f\""

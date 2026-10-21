@@ -10,7 +10,7 @@ services:
       - TZ=${TZ:-America/Chicago}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - DATABASE_URL=sqlite:////config/watchdog.db
-      - AMP_BASE_URL=${AMP_BASE_URL:-http://10.0.1.52:8080}
+      - AMP_BASE_URL=${AMP_BASE_URL:-http://amp.example.lan:8080}
       - AMP_USERNAME=${AMP_USERNAME:-status-reader}
       - AMP_PASSWORD=${AMP_PASSWORD}
       - SCHEDULER_TICK=${SCHEDULER_TICK:-5}
