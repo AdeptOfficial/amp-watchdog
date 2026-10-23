@@ -55,7 +55,7 @@ FastAPI · SQLAlchemy 2 (async, SQLite) · htmx + hand-rolled AdepT token CSS (n
 ## Quick start
 
 ```bash
-cp .env.template .env      # fill AMP_PASSWORD (a read-only AMP user; see below)
+install -m 600 .env.template .env      # fill AMP_PASSWORD (a read-only AMP user; see below)
 docker compose up -d --build
 # open http://localhost:8200
 ```

@@ -22,7 +22,7 @@ promotion gate is `~/git/workflows/promote-to-prod.md`. Facts below come from
 ## Run anywhere
 
 ```bash
-cp .env.template .env                  # fill in values
+install -m 600 .env.template .env      # fill in values
 docker compose up -d --build
 curl -f http://localhost:8200/api/health
 ```
