@@ -1,4 +1,4 @@
-Quick notes, one per line. Filed as records at session start, then removed; not approval to build.
+Quick notes; a numbered note may run over several lines. Filed as records at session start, then removed; not approval to build.
 
 ----------------------------------------
 bugs: (works wrongly)
