@@ -5,7 +5,8 @@ Watchlist status monitor for CubeCoders AMP instances. FastAPI + async SQLAlchem
 ## Startup
 
 1. **Read `inbox.txt`** and run `~/git/workflows/process-inbox.md` (one new record per line, then clear the processed lines).
-2. **Read `DIARY.md`** for recent history. Write a dated entry (newest on top) after meaningful changes.
+2. **Read the newest `DIARY.md` entry** only; its `Next:` line is the resume point. Diary rule:
+   `~/git/homeserver-apps/AGENTS.md` → Resuming.
 
 ## Architecture (read before changing code)
 
