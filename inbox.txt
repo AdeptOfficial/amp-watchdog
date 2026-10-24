@@ -1,19 +1,11 @@
-Quick capture: drop one-line notes here when no assistant session is open.
-At session start the assistant files each line as its own record and removes it;
-these headers stay. Filing a note is not approval to build it.
-
-  bugs:     something works wrongly (crash, wrong display, stuck, regression)
-  issues:   a gap, improvement, design question or investigation
-  features: anything new, rough ideas included (filed with Status: Idea)
-
-Procedure: ~/git/workflows/process-inbox.md
+Quick notes, one per line. Filed as records at session start, then removed; not approval to build.
 
 ----------------------------------------
-bugs:
+bugs: (works wrongly)
 
 ----------------------------------------
-issues:
+issues: (gap, question, improvement)
 
 ----------------------------------------
-features:
+features: (anything new, ideas too)
 
