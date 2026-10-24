@@ -1,9 +1,19 @@
-Quick capture file for issues/features when no assistant is available.
-Add notes under "Issues:" or "Features:" — the assistant processes and clears them on startup.
+Quick capture: drop one-line notes here when no assistant session is open.
+At session start the assistant files each line as its own record and removes it;
+these headers stay. Filing a note is not approval to build it.
+
+  bugs:     something works wrongly (crash, wrong display, stuck, regression)
+  issues:   a gap, improvement, design question or investigation
+  features: anything new, rough ideas included (filed with Status: Idea)
+
+Procedure: ~/git/workflows/process-inbox.md
+
+----------------------------------------
+bugs:
 
 ----------------------------------------
 issues:
 
------------------------------------------
+----------------------------------------
 features:
 
