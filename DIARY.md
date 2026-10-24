@@ -1,3 +1,10 @@
+## 2026-10-24: Tracker archive layout and standard inbox
+
+`ideas/` folded into `features/` (ideas are Status: Idea); `features/implemented`, `bugs/resolved`,
+`issues/resolved` and `ideas/declined` moved to each folder's `archive/`; links and indexes
+updated. `inbox.txt` now has `bugs:`, `issues:`, `features:` sections. Rules: `~/git/homeserver-apps/AGENTS.md`.
+Next: unchanged.
+
 ## 2026-10-20: Public-repo scrub
 
 Replaced the AMP backend's private address with `amp.example.lan` in config

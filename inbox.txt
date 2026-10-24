@@ -1,9 +1,11 @@
-Quick capture file for issues/features when no assistant is available.
-Add notes under "Issues:" or "Features:" — the assistant processes and clears them on startup.
+Quick notes; a numbered note may run over several lines. Filed as records at session start, then removed; not approval to build.
 
 ----------------------------------------
-issues:
+bugs: (works wrongly)
 
------------------------------------------
-features:
+----------------------------------------
+issues: (gap, question, improvement)
+
+----------------------------------------
+features: (anything new, ideas too)
 
